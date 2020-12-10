@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -7,12 +7,10 @@ from .models import Commit
 from .serializers import CommitSerializer, RepositorySerializer
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def commit_list_view(request):
-    commits = Commit.objects.all()
-    serializer = CommitSerializer(commits, many=True)
-    return Response(serializer.data)
+class CommitViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Commit.objects.all()
+    serializer_class = CommitSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 @api_view(["POST"])

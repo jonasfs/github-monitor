@@ -27,8 +27,9 @@ class CommitTests(APITestCase):
     def test_get_commit_as_user(self):
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        commit = response.data[0]
+        results = response.data['results']
+        self.assertEqual(len(results), 1)
+        commit = results[0]
         self.assertEqual(commit['sha'], 'abcdef')
 
     def test_get_multiple_commits(self):
@@ -41,14 +42,16 @@ class CommitTests(APITestCase):
             url='http://fakeurl.com/', date=timezone.now(),
             avatar='http://fakeurl.com/avatar.jpg', repository=self.repo)
         response = self.client.get(self.url, format='json')
+        results = response.data['results']
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(len(results), 3)
 
     def test_post_commit(self):
         data = {}
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 405)
-        self.assertEqual(len(response.data), 1)
+        commits_count = Commit.objects.all().count()
+        self.assertEqual(commits_count, 1)
 
 
 class RepositoryTests(APITestCase):
