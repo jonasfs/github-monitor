@@ -73,6 +73,7 @@ class RepositoryTests(APITestCase):
         }
         response = anon_client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 403)
+        repo_count = Repository.objects.all().count()
         self.assertEqual(repo_count, 0)
 
     def test_get_repositories_as_user(self):

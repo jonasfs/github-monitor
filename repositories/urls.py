@@ -7,11 +7,8 @@ app_name = 'repositories'
 
 router = DefaultRouter()
 router.register(r'commits', views.CommitViewSet)
+router.register(r'repositories', views.RepositoryViewSet)
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),
-    url(
-        r'^api/repositories/',
-        views.repository_create_view,
-        name='repositories-create'),
 ]
