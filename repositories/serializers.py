@@ -11,12 +11,8 @@ class RepositorySerializer(serializers.ModelSerializer):
 
     def validate_name(self, value):
         user = self.context['request'].user
-        owner_val, repo_val = value.split('/', 1)
 
-        if user.username != owner_val:
-            raise serializers.ValidationError(
-                'This repository doesn\'t belong to you')
-        elif not github_utils.repo_exists(value):
+        if not github_utils.repo_exists(value, user):
             raise serializers.ValidationError(
                 'This repository doesn\'t exist')
         return value

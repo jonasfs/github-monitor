@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 class CommitTests(APITestCase):
     def setUp(self):
-        self.repo = Repository.objects.create(name='user/test_repo')
+        self.repo = Repository.objects.create(name='test_repo')
         Commit.objects.create(
             message='commit msg', sha='abcdef', author='user',
             url='http://fakeurl.com/', date=timezone.now(),
@@ -70,7 +70,7 @@ class RepositoryTests(APITestCase):
     def test_post_repositories_as_anon(self):
         anon_client = APIClient()
         data = {
-            'name': 'user/test_repo'
+            'name': 'test_repo'
         }
 
         response = anon_client.post(self.url, data, format='json')
@@ -85,7 +85,7 @@ class RepositoryTests(APITestCase):
     @patch('repositories.github_utils.repo_exists')
     def test_post_repositories_as_user(self, mock_repo_exists):
         data = {
-            'name': 'user/test_repo'
+            'name': 'test_repo'
         }
         mock_repo_exists.return_value = True
         response = self.client.post(self.url, data, format='json')
@@ -95,21 +95,9 @@ class RepositoryTests(APITestCase):
         self.assertEqual(repo_count, 1)
 
     @patch('repositories.github_utils.repo_exists')
-    def test_post_with_invalid_repo_owner(self, mock_repo_exists):
-        data = {
-            'name': 'not_user/test_repo'
-        }
-        mock_repo_exists.return_value = True
-        response = self.client.post(self.url, data, format='json')
-        mock_repo_exists.assert_not_called()
-        self.assertEqual(response.status_code, 400)
-        repo_count = Repository.objects.all().count()
-        self.assertEqual(repo_count, 0)
-
-    @patch('repositories.github_utils.repo_exists')
     def test_post_with_non_existent_repo(self, mock_repo_exists):
         data = {
-            'name': 'user/test_repo'
+            'name': 'test_repo'
         }
         mock_repo_exists.return_value = False
         response = self.client.post(self.url, data, format='json')
