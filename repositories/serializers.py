@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Commit, Repository
+from . import github_utils
 
 
 class RepositorySerializer(serializers.ModelSerializer):
@@ -15,6 +16,9 @@ class RepositorySerializer(serializers.ModelSerializer):
         if user.username != owner_val:
             raise serializers.ValidationError(
                 'This repository doesn\'t belong to you')
+        elif not github_utils.repo_exists(value):
+            raise serializers.ValidationError(
+                'This repository doesn\'t exist')
         return value
 
 
