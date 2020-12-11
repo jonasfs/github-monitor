@@ -19,14 +19,3 @@ class RepositoryViewSet(viewsets.ModelViewSet):
     serializer_class = RepositorySerializer
     permission_classes = (IsAuthenticated,)
     http_method_names = ['post']
-
-
-'''
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def repository_create_view(request):
-    serializer = RepositorySerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
-'''
