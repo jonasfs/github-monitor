@@ -88,3 +88,12 @@ class RepositoryTests(APITestCase):
         self.assertEqual(response.status_code, 201)
         repo_count = Repository.objects.all().count()
         self.assertEqual(repo_count, 1)
+
+    def test_post_with_invalid_repo_owner(self):
+        data = {
+            'name': 'not_user/test_repo'
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+        repo_count = Repository.objects.all().count()
+        self.assertEqual(repo_count, 0)
