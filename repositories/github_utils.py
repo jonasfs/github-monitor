@@ -1,3 +1,6 @@
+from django.utils import timezone
+import datetime
+import json
 import urllib.request
 
 
@@ -12,3 +15,14 @@ def repo_exists(name, owner):
         if response.status == 200:
             return True
     return False
+
+
+def fetch_commits(name, owner):
+    date = (timezone.now() - datetime.timedelta(days=30)).isoformat()
+    url = '{}{}/{}/commits?since={}'.format(GITHUB_URL, owner, name, date)
+    response = urllib.request.urlopen(url)
+    if response:
+        if response.status == 200:
+            data = json.load(response)
+            return data
+    return None
