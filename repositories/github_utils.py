@@ -3,6 +3,7 @@ import datetime
 import json
 import urllib.request
 
+from .models import Commit
 
 GITHUB_URL = 'https://api.github.com/repos/'
 
@@ -26,3 +27,19 @@ def fetch_commits(name, owner):
             data = json.load(response)
             return data
     return None
+
+
+def add_commits_to_db(repo_instance, api_commits):
+    commit_objs = [
+        Commit(
+            message=commit['commit']['message'],
+            sha=commit['sha'],
+            author=commit['author']['login'],
+            url=commit['html_url'],
+            date=commit['commit']['author']['date'],
+            avatar=commit['author']['avatar_url'],
+            repository=repo_instance
+        )
+        for commit in api_commits
+    ]
+    Commit.objects.bulk_create(commit_objs)

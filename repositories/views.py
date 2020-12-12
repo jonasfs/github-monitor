@@ -1,11 +1,13 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
+from urllib.error import URLError, HTTPError
 
 from .models import (
     Commit,
     Repository
 )
 from .serializers import CommitSerializer, RepositorySerializer
+from . import github_utils
 
 
 class CommitViewSet(viewsets.ReadOnlyModelViewSet):
@@ -19,3 +21,21 @@ class RepositoryViewSet(viewsets.ModelViewSet):
     serializer_class = RepositorySerializer
     permission_classes = (IsAuthenticated,)
     http_method_names = ['post']
+
+    def perform_create(self, serializer):
+        data = self.request.data
+        if 'name' not in data:
+            raise serializers.ValidationError({
+                'name': 'No repository name provided'})
+        repo = data['name']
+        owner = self.request.user
+        try:
+            commits = github_utils.fetch_commits(repo, owner)
+            instance = serializer.save()
+            github_utils.add_commits_to_db(instance, commits)
+        except URLError:
+            raise serializers.ValidationError(
+                'The url timed out')
+        except (HTTPError, AttributeError):
+            raise serializers.ValidationError(
+                'The GitHub API didn\'t reply properly')

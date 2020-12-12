@@ -83,16 +83,50 @@ class RepositoryTests(APITestCase):
         self.assertEqual(response.status_code, 405)
 
     @patch('repositories.github_utils.repo_exists')
-    def test_post_repositories_as_user(self, mock_repo_exists):
+    @patch('repositories.github_utils.fetch_commits')
+    def test_post_repositories_as_user(
+            self, mock_fetch_commits, mock_repo_exists):
         data = {
             'name': 'test_repo'
         }
         mock_repo_exists.return_value = True
+        mock_fetch_commits.return_value = [
+            {
+                'commit': {
+                    'message': 'commit msg 1',
+                    'author': {
+                        'date': timezone.now().isoformat(),
+                    },
+                },
+                'sha': 'abcdef',
+                'author': {
+                    'login': 'user',
+                    'avatar_url': 'http://fakeurl.com/avatar.jpg',
+                },
+                'html_url': 'http://fakeurl.com/commit/abcdef',
+            },
+            {
+                'commit': {
+                    'message': 'commit msg 2',
+                    'author': {
+                        'date': timezone.now().isoformat(),
+                    },
+                },
+                'sha': 'aaaaa',
+                'author': {
+                    'login': 'user',
+                    'avatar_url': 'http://fakeurl.com/avatar.jpg',
+                },
+                'html_url': 'http://fakeurl.com/commit/abcdef',
+            },
+        ]
         response = self.client.post(self.url, data, format='json')
         mock_repo_exists.assert_called()
         self.assertEqual(response.status_code, 201)
         repo_count = Repository.objects.all().count()
         self.assertEqual(repo_count, 1)
+        commit_count = Commit.objects.all().count()
+        self.assertEqual(commit_count, 2)
 
     @patch('repositories.github_utils.repo_exists')
     def test_post_with_non_existent_repo(self, mock_repo_exists):
@@ -105,3 +139,20 @@ class RepositoryTests(APITestCase):
         self.assertEqual(response.status_code, 400)
         repo_count = Repository.objects.all().count()
         self.assertEqual(repo_count, 0)
+
+    @patch('repositories.github_utils.repo_exists')
+    @patch('repositories.github_utils.fetch_commits')
+    def test_post_repository_with_no_commits(
+            self, mock_fetch_commits, mock_repo_exists):
+        data = {
+            'name': 'test_repo'
+        }
+        mock_repo_exists.return_value = True
+        mock_fetch_commits.return_value = []
+        response = self.client.post(self.url, data, format='json')
+        mock_repo_exists.assert_called()
+        self.assertEqual(response.status_code, 201)
+        repo_count = Repository.objects.all().count()
+        self.assertEqual(repo_count, 1)
+        commit_count = Commit.objects.all().count()
+        self.assertEqual(commit_count, 0)
