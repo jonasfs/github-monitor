@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from urllib.error import URLError, HTTPError
 
 from .models import Commit, Repository
 from . import github_utils
@@ -12,9 +13,17 @@ class RepositorySerializer(serializers.ModelSerializer):
     def validate_name(self, value):
         user = self.context['request'].user
 
-        if not github_utils.repo_exists(value, user):
+        try:
+            repo_exists = github_utils.repo_exists(value, user)
+            if not repo_exists:
+                raise serializers.ValidationError(
+                    'This repository doesn\'t exist')
+        except URLError:
             raise serializers.ValidationError(
-                'This repository doesn\'t exist')
+                'The url timed out')
+        except (HTTPError, AttributeError):
+            raise serializers.ValidationError(
+                'The GitHub API didn\'t reply properly')
         return value
 
 
