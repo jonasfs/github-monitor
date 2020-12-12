@@ -20,7 +20,6 @@ class RepositoryViewSet(viewsets.ModelViewSet):
     queryset = Repository.objects.all()
     serializer_class = RepositorySerializer
     permission_classes = (IsAuthenticated,)
-    http_method_names = ['post']
 
     def perform_create(self, serializer):
         data = self.request.data

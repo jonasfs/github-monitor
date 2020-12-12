@@ -79,8 +79,11 @@ class RepositoryTests(APITestCase):
         self.assertEqual(repo_count, 0)
 
     def test_get_repositories_as_user(self):
+        Repository.objects.create(name='test_repo')
         response = self.client.get(self.url, format='json')
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 200)
+        repo_count = Repository.objects.all().count()
+        self.assertEqual(repo_count, 1)
 
     @patch('repositories.github_utils.repo_exists')
     @patch('repositories.github_utils.fetch_commits')
