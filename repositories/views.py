@@ -1,4 +1,5 @@
 from rest_framework import filters, viewsets, serializers
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from urllib.error import URLError, HTTPError
 
@@ -19,6 +20,7 @@ class CommitViewSet(viewsets.ReadOnlyModelViewSet):
 class RepositoryViewSet(viewsets.ModelViewSet):
     queryset = Repository.objects.all()
     serializer_class = RepositorySerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
