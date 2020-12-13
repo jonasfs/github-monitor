@@ -159,3 +159,25 @@ class RepositoryTests(APITestCase):
         self.assertEqual(repo_count, 1)
         commit_count = Commit.objects.all().count()
         self.assertEqual(commit_count, 0)
+
+    def test_get_repositories_search(self):
+        Repository.objects.create(name='test_repo')
+        Repository.objects.create(name='another_repo')
+
+        url = '{}?search=repo'.format(self.url)
+        response = self.client.get(url, format='json')
+        results = response.data['results']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(results), 2)
+
+        url = '{}?search=test'.format(self.url)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 1)
+
+        url = '{}?search='.format(self.url)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 2)

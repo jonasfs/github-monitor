@@ -1,4 +1,4 @@
-from rest_framework import viewsets, serializers
+from rest_framework import filters, viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
 from urllib.error import URLError, HTTPError
 
@@ -20,6 +20,8 @@ class RepositoryViewSet(viewsets.ModelViewSet):
     queryset = Repository.objects.all()
     serializer_class = RepositorySerializer
     permission_classes = (IsAuthenticated,)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
     def perform_create(self, serializer):
         data = self.request.data
