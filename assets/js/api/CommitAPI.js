@@ -19,6 +19,9 @@ export const createRepository = (values, headers, formDispatch) => axios.post('/
     console.log(err);
   });
 
-export const getRepos = () => axios.get(`/api/repositories/`);
+export const getRepos = (limit=0, offset=0) => {
+	let baseURL = `/api/repositories/?limit=${limit}&offset=${offset}`;
+	return axios.get(baseURL);
+}
 
 export const getReposSearch = value => axios.get(`/api/repositories?search=${value}`);
