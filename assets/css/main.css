@@ -161,6 +161,10 @@ body {
   text-indent: inherit;
 }
 
+.breadcrumb-nav {
+  margin-top: 20px;
+}
+
 @media(min-width:768px) {
   #wrapper {
     padding-left: 0;
