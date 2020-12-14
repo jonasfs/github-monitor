@@ -16,6 +16,7 @@ from . import github_utils
 class CommitViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Commit.objects.all()
     serializer_class = CommitSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_fields = {'author': ['exact'], 'repository__name': ['exact']}
