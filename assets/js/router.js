@@ -26,6 +26,8 @@ export default (
 					<RepoCreateContainer />
 						<Switch>
 							<Route path="/" exact component={CommitListContainer} />
+							<Route path="/author/:author" exact component={CommitListContainer} />
+							<Route path="/repo/:repo" exact component={CommitListContainer} />
 						</Switch>
 				</div>
 			</div>

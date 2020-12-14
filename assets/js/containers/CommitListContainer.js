@@ -4,9 +4,11 @@ import {connect} from 'react-redux';
 import * as commitAPI from '../api/CommitAPI';
 import CommitList from '../components/CommitList';
 
+
 class CommitListContainer extends React.Component {
   componentDidMount() {
-    commitAPI.getCommits();
+		let {author, repo} = this.props.match.params;
+    commitAPI.getCommits(author, repo);
   }
 
   render() {

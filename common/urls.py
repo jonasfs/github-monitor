@@ -7,6 +7,8 @@ app_name = 'common'
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
+    path('author/<author>', HomeView.as_view(), name='author'),
+    path('repo/<repo>', HomeView.as_view(), name='repo'),
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout'),
 ]

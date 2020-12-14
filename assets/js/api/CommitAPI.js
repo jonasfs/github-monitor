@@ -5,10 +5,19 @@ import {
   createRepositorySuccess, getCommitsSuccess,
 } from '../actions/CommitActions';
 
-export const getCommits = () => axios.get(`/api/commits/`)
-  .then((response) => {
-    store.dispatch(getCommitsSuccess({...response.data.results}));
-  });
+export const getCommits = (author='', repo='') => {
+	let baseURL = '/api/commits/?';
+	if (author) {
+		baseURL += `&author=${author}`
+	}
+	if (repo) {
+		baseURL += `&repository__name=${repo}`
+	}
+	axios.get(baseURL)
+		.then((response) => {
+			store.dispatch(getCommitsSuccess({...response.data.results}));
+		});
+}
 
 export const createRepository = (values, headers, formDispatch) => axios.post('/api/repositories/', values, {headers})
   .then((response) => {
