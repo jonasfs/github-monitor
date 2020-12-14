@@ -9,6 +9,7 @@ class Repository(models.Model):
 
     class Meta:
         verbose_name_plural = 'Repositories'
+        ordering = ('-id',)
 
 
 class Commit(models.Model):
