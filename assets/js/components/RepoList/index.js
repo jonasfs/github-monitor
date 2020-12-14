@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 class RepoList extends React.Component {
 	render() {
@@ -22,11 +23,16 @@ class RepoList extends React.Component {
 					: (
 						<ul className="list-group list-group-flush">
 							{repos.map((repo, index) => (
-								<li className="list-group-item list-group-item-action" key={index}>
-									<span>
-										<i className="fa fa-archive" aria-hidden="true"></i>
-										<span> {repo.name} </span>
-									</span>
+								<li
+									className="list-group-item list-group-item-action"
+									key={index}
+								>
+									<Link to={`/repo/${repo.name}`}>
+										<span>
+											<i className="fa fa-archive" aria-hidden="true"></i>
+											<span> {repo.name} </span>
+										</span>
+									</Link>
 								</li>
 							))}
 						</ul>
