@@ -1,4 +1,6 @@
-from rest_framework import filters, viewsets, serializers
+from django_filters import rest_framework as filters
+from rest_framework import viewsets, serializers
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from urllib.error import URLError, HTTPError
@@ -15,6 +17,8 @@ class CommitViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Commit.objects.all()
     serializer_class = CommitSerializer
     permission_classes = (IsAuthenticated,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_fields = {'author': ['exact'], 'repository__name': ['exact']}
 
 
 class RepositoryViewSet(viewsets.ModelViewSet):
@@ -22,7 +26,7 @@ class RepositoryViewSet(viewsets.ModelViewSet):
     serializer_class = RepositorySerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthenticated,)
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [SearchFilter]
     search_fields = ['name']
 
     def perform_create(self, serializer):

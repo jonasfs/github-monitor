@@ -54,6 +54,53 @@ class CommitTests(APITestCase):
         commits_count = Commit.objects.all().count()
         self.assertEqual(commits_count, 1)
 
+    def test_get_commits_filtering(self):
+        other_repo = Repository.objects.create(name='other_repo')
+        Commit.objects.create(
+            message='commit msg 2', sha='aaaaa', author='user',
+            url='http://fakeurl.com/', date=timezone.now(),
+            avatar='http://fakeurl.com/avatar.jpg', repository=self.repo)
+        Commit.objects.create(
+            message='commit msg 3', sha='bbbbb', author='other_user',
+            url='http://fakeurl.com/', date=timezone.now(),
+            avatar='http://fakeurl.com/avatar.jpg', repository=self.repo)
+        Commit.objects.create(
+            message='commit msg 4', sha='ccccc', author='other_user',
+            url='http://fakeurl.com/', date=timezone.now(),
+            avatar='http://fakeurl.com/avatar.jpg', repository=other_repo)
+        Commit.objects.create(
+            message='commit msg 5', sha='ddddd', author='other_user',
+            url='http://fakeurl.com/', date=timezone.now(),
+            avatar='http://fakeurl.com/avatar.jpg', repository=other_repo)
+
+        response = self.client.get(self.url, format='json')
+        results = response.data['results']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(results), 5)
+
+        url = '{}?author=other_user'.format(self.url)
+        response = self.client.get(url, format='json')
+        results = response.data['results']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(results), 3)
+
+        url = '{}?repository__name=test_repo'.format(self.url)
+        response = self.client.get(url, format='json')
+        results = response.data['results']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(results), 3)
+
+        url = '{}?author=user&repository__name=other_repo'.format(self.url)
+        response = self.client.get(url, format='json')
+        results = response.data['results']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(results), 0)
+
+        url = '{}?author=other_user&repository__name=other_repo'.format(self.url)
+        response = self.client.get(url, format='json')
+        results = response.data['results']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(results), 2)
 
 class RepositoryTests(APITestCase):
     def setUp(self):
@@ -180,4 +227,3 @@ class RepositoryTests(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         results = response.data['results']
-        self.assertEqual(len(results), 2)

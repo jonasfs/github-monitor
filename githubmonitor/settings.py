@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'social_django',
     'webpack_loader',
+    'django_filters',
     'common.apps.CommonConfig',
     'repositories.apps.RepositoriesConfig',
 ]
