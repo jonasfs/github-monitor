@@ -5,6 +5,10 @@ const initialState = {
 	count: 0,
   successMessage: false,
 	loading: true,
+	repoResults: [],
+	repoCount: 0,
+	repoLoading: true,
+	repoSearching: false,
 };
 
 const commitReducer = (state = initialState, action) => {
@@ -19,6 +23,14 @@ const commitReducer = (state = initialState, action) => {
     case types.CREATE_REPOSITORY_SUCCESS: {
       return {...state, successMessage: action.payload.successMessage};
     }
+    case types.GET_REPOS_SUCCESS:
+      return {
+        ...state,
+        repoResults: action.payload.results,
+        repoCount: action.payload.count,
+        repoLoading: action.payload.loading,
+				repoSearching: action.payload.searching,
+      };
     default:
       return state;
   }

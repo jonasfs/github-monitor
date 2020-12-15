@@ -3,6 +3,7 @@ import {reset} from 'redux-form';
 import store from '../store';
 import {
   createRepositorySuccess, getCommitsSuccess,
+	getReposSuccess,
 } from '../actions/CommitActions';
 
 export const getCommits = (author='', repo='', limit=0, offset=0, oldCount=0) => {
@@ -29,9 +30,11 @@ export const createRepository = (values, headers, formDispatch) => axios.post('/
     console.log(err);
   });
 
-export const getRepos = (limit=0, offset=0) => {
-	let baseURL = `/api/repositories/?limit=${limit}&offset=${offset}`;
-	return axios.get(baseURL);
+export const getRepos = (limit=0, offset=0, oldCount=0, search='') => {
+	store.dispatch(getReposSuccess([], oldCount, true, (search? true : false)));
+	let baseURL = `/api/repositories/?search=${search}&limit=${limit}&offset=${offset}`;
+	axios.get(baseURL)
+		.then((response) => {
+			store.dispatch(getReposSuccess(response.data.results, response.data.count, false, false));
+		});
 }
-
-export const getReposSearch = value => axios.get(`/api/repositories?search=${value}`);

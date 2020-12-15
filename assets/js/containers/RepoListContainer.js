@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 import RepoSearchBar from '../components/RepoSearchBar';
 import RepoList from '../components/RepoList';
 import Paginator from '../components/Paginator';
@@ -8,61 +10,39 @@ class RepoListContainer extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			repos: [],
 			timeoutID: null,
 			search: "",
-			loading: true,
-			searching: true,
 			limit: 10,
 			offset: 0,
-			count: 0,
 		}
 
 	}
 
 	searchBarChange = value => {
-		const waitSeconds = 2;
+		let {limit} = this.state;
+		const waitSeconds = 1;
 		clearTimeout(this.state.timeoutID);
 		let timeout = setTimeout(() => {
-			commitAPI.getReposSearch(value).then((response) => {
-				this.setState({
-					repos: response.data.results,
-					offset: 0,
-					count: response.data.count,
-					searching: false,
-					loading: false});
-			});
+			commitAPI.getRepos(limit, 0, 0, value);
 		}, waitSeconds * 1000);
-		this.setState({search: value, timeoutID: timeout, loading: true, searching: true});
+		this.setState({search: value, timeoutID: timeout});
 	}
 
 	getPage = newOffset => {
-		let oldOffset = this.state.offset;
-		this.setState({offset: newOffset, loading: true});
-		commitAPI.getRepos(this.state.limit, newOffset).then((response) => {
-			this.setState({
-				repos: response.data.results,
-				offset: newOffset,
-				loading: false});
-		}).catch((error) => {
-			console.log(error);
-			this.setState({offset: oldOffset, loading: false});
-		});
+		let {search, limit} = this.state;
+		let { count } = this.props;
+		this.setState({offset: newOffset});
+		commitAPI.getRepos(limit, newOffset, count, search);
 	}
 
 	componentDidMount() {
-		commitAPI.getRepos().then((response) => {
-			this.setState({
-				repos: response.data.results,
-				count: response.data.count,
-				loading: false,
-				searching: false
-			});
-		});
+		commitAPI.getRepos();
 	}
 
 	render() {
-		const {repos, search, loading, searching, offset, limit, count} = this.state;
+		const {search, offset, limit} = this.state;
+		const { loading, count, searching } = this.props;
+		const repos = this.props.results;
 		return (
 			<div>
 				<RepoSearchBar searchBarChange={this.searchBarChange} />
@@ -85,4 +65,19 @@ class RepoListContainer extends React.Component {
 		);
 	}
 }
-export default RepoListContainer;
+
+RepoListContainer.propTypes = {
+  results: PropTypes.arrayOf(PropTypes.object).isRequired,
+  count: PropTypes.number.isRequired,
+  loading: PropTypes.bool.isRequired,
+  searching: PropTypes.bool.isRequired,
+};
+
+const mapStateToProps = store => ({
+  results: store.commitState.repoResults,
+	count: store.commitState.repoCount,
+  loading: store.commitState.repoLoading,
+  searching: store.commitState.repoSearching,
+});
+
+export default connect(mapStateToProps)(RepoListContainer);

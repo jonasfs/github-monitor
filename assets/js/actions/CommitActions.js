@@ -9,3 +9,8 @@ export const getCommitsSuccess = (results, count, loading) => ({
   type: types.GET_COMMITS_SUCCESS,
   payload: {results, count, loading},
 });
+
+export const getReposSuccess = (results, count, loading, searching) => ({
+  type: types.GET_REPOS_SUCCESS,
+  payload: {results, count, loading, searching},
+});
