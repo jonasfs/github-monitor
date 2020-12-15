@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 class RepoList extends React.Component {
 	render() {
-		const {repos, search, loading, searching, paginator} = this.props;
+		const {repos, search, loading, searching, paginator, showCommitCount} = this.props;
 		return (
 			<div className="sidebar-repos">
 				<div className="list">
@@ -31,6 +31,11 @@ class RepoList extends React.Component {
 										<span>
 											<i className="fa fa-archive" aria-hidden="true"></i>
 											<span> {repo.name} </span>
+												{ showCommitCount && (
+													<span>
+														{ repo.commit_count }
+													</span>
+												)}
 										</span>
 									</Link>
 								</li>

@@ -6,9 +6,14 @@ from . import github_utils
 
 
 class RepositorySerializer(serializers.ModelSerializer):
+    commit_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Repository
-        fields = ('name',)
+        fields = ('name', 'commit_count',)
+
+    def get_commit_count(self, obj):
+        return obj.commit_set.count()
 
     def validate_name(self, value):
         user = self.context['request'].user
@@ -25,7 +30,7 @@ class RepositorySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'The GitHub API didn\'t reply properly')
         return value
-
+    
 
 class CommitSerializer(serializers.ModelSerializer):
     repository = serializers.StringRelatedField(many=False)

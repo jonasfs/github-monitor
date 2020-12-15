@@ -39,7 +39,7 @@ class RepositoryViewSet(viewsets.ModelViewSet):
         owner = self.request.user
         try:
             commits = github_utils.fetch_commits(repo, owner)
-            instance = serializer.save()
+            instance = serializer.save(author=owner)
             github_utils.add_commits_to_db(instance, commits)
         except URLError:
             raise serializers.ValidationError(
@@ -47,3 +47,8 @@ class RepositoryViewSet(viewsets.ModelViewSet):
         except (HTTPError, AttributeError):
             raise serializers.ValidationError(
                 'The GitHub API didn\'t reply properly')
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = Repository.objects.all().filter(author=user)
+        return qs

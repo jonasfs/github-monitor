@@ -12,6 +12,7 @@ def repo_exists(name, owner):
     url = '{}{}/{}'.format(GITHUB_URL, owner, name)
     request = urllib.request.Request(url, method="HEAD")
     response = urllib.request.urlopen(request)
+    print(str(response))
     if response:
         if response.status == 200:
             return True
