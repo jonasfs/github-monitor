@@ -21,7 +21,7 @@ class CommitListContainer extends React.Component {
 	getPage = newOffset => {
 		let {author, repo} = this.props.match.params;
 		let oldOffset = this.state.offset;
-		let {count} = this.props.data;
+		let {count} = this.props;
 		this.setState({offset: newOffset});
 		commitAPI.getCommits(author, repo, this.state.limit, newOffset, count);
 	}
@@ -42,9 +42,8 @@ class CommitListContainer extends React.Component {
 
   render() {
 		const { limit, offset } = this.state;
-		const { loading } = this.props;
-		const {count} = this.props.data;
-    const commits = this.props.data.results;
+		const { loading, count } = this.props;
+    const commits = this.props.results;
 		const {author, repo} = this.props.match.params;
 		const isHome = (!author && !repo);
     return (
@@ -87,12 +86,14 @@ class CommitListContainer extends React.Component {
 }
 
 CommitListContainer.propTypes = {
-  data: PropTypes.object.isRequired,
+  results: PropTypes.arrayOf(PropTypes.object).isRequired,
+  count: PropTypes.number.isRequired,
   loading: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = store => ({
-  data: store.commitState.data,
+  results: store.commitState.results,
+	count: store.commitState.count,
   loading: store.commitState.loading,
 });
 

@@ -6,7 +6,7 @@ import {
 } from '../actions/CommitActions';
 
 export const getCommits = (author='', repo='', limit=0, offset=0, oldCount=0) => {
-	store.dispatch(getCommitsSuccess({count: oldCount, results: []}, true));
+	store.dispatch(getCommitsSuccess([], oldCount, true));
 	let baseURL = `/api/commits/?limit=${limit}&offset=${offset}`;
 	if (author) {
 		baseURL += `&author=${author}`
@@ -16,7 +16,7 @@ export const getCommits = (author='', repo='', limit=0, offset=0, oldCount=0) =>
 	}
 	axios.get(baseURL)
 		.then((response) => {
-			store.dispatch(getCommitsSuccess(response.data, false));
+			store.dispatch(getCommitsSuccess(response.data.results, response.data.count, false));
 		});
 }
 
