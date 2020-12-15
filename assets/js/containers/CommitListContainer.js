@@ -58,19 +58,15 @@ class CommitListContainer extends React.Component {
 								</Link>
 							)}
 						</li>
-						{author? (
-							<li className="breadcrumb-item" aria-current="page"> Author </li>
-						) : ''}
-						{author? (
+						{author? ([
+							<li className="breadcrumb-item" aria-current="page"> Author </li>,
 							<li className="breadcrumb-item active" aria-current="page"> {author} </li>
-						) : ''}
+						]) : ''}
 
-						{repo? (
-							<li className="breadcrumb-item" aria-current="page"> Repository </li>
-						) : ''}
-						{repo? (
+						{repo? ([
+							<li className="breadcrumb-item" aria-current="page"> Repository </li>,
 							<li className="breadcrumb-item active" aria-current="page"> {repo} </li>
-						) : ''}
+						]) : ''}
 					</ol>
 				</nav>
 				<CommitList
