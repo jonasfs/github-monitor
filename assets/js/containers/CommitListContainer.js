@@ -31,12 +31,17 @@ class CommitListContainer extends React.Component {
     commitAPI.getCommits(author, repo);
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
 		let {author, repo} = this.props.match.params;
+		const {refresh} = this.props;
+
 		if ((author !== this.state.author) || (repo !== this.state.repo) ) {
 			this.setState({author: author, repo: repo, offset: 0});
 			commitAPI.getCommits(author, repo);
+		} else if (refresh && (refresh !== prevProps.refresh)) {
+			this.getPage(0);
 		}
+
 	}
 
   render() {
@@ -88,12 +93,14 @@ CommitListContainer.propTypes = {
   results: PropTypes.arrayOf(PropTypes.object).isRequired,
   count: PropTypes.number.isRequired,
   loading: PropTypes.bool.isRequired,
+  refresh: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = store => ({
   results: store.commitState.results,
 	count: store.commitState.count,
   loading: store.commitState.loading,
+  refresh: store.commitState.refresh,
 });
 
 export default connect(mapStateToProps)(CommitListContainer);

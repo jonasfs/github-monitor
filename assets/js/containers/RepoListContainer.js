@@ -5,6 +5,7 @@ import RepoSearchBar from '../components/RepoSearchBar';
 import RepoList from '../components/RepoList';
 import Paginator from '../components/Paginator';
 import * as commitAPI from '../api/CommitAPI';
+import store from '../store';
 
 class RepoListContainer extends React.Component {
 	constructor(props) {
@@ -15,7 +16,6 @@ class RepoListContainer extends React.Component {
 			limit: 10,
 			offset: 0,
 		}
-
 	}
 
 	searchBarChange = value => {
@@ -35,6 +35,12 @@ class RepoListContainer extends React.Component {
 		commitAPI.getRepos(limit, newOffset, count, search);
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		const {refresh} = this.props;
+		if (refresh && (refresh !== prevProps.refresh)) {
+			this.getPage(0);
+		}
+	}
 
 	componentDidMount() {
 		commitAPI.getRepos();
@@ -72,6 +78,7 @@ RepoListContainer.propTypes = {
   count: PropTypes.number.isRequired,
   loading: PropTypes.bool.isRequired,
   searching: PropTypes.bool.isRequired,
+  refresh: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = store => ({
@@ -79,6 +86,7 @@ const mapStateToProps = store => ({
 	count: store.commitState.repoCount,
   loading: store.commitState.repoLoading,
   searching: store.commitState.repoSearching,
+  refresh: store.commitState.refresh,
 });
 
 export default connect(mapStateToProps)(RepoListContainer);

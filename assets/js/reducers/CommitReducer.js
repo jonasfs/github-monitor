@@ -9,6 +9,7 @@ const initialState = {
 	repoCount: 0,
 	repoLoading: true,
 	repoSearching: false,
+	refresh: false,
 };
 
 const commitReducer = (state = initialState, action) => {
@@ -34,6 +35,12 @@ const commitReducer = (state = initialState, action) => {
         repoLoading: action.payload.loading,
 				repoSearching: action.payload.searching,
       };
+    case types.REFRESH_APP: {
+			return {
+				...state,
+				refresh: action.payload.refresh,
+			};
+    }
     default:
       return state;
   }

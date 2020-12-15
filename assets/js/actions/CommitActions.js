@@ -14,3 +14,8 @@ export const getReposSuccess = (results, count, loading, searching) => ({
   type: types.GET_REPOS_SUCCESS,
   payload: {results, count, loading, searching},
 });
+
+export const refreshApp = (refresh) => ({
+	type: types.REFRESH_APP,
+	payload: {refresh},
+});
