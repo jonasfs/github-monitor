@@ -25,7 +25,7 @@ class RepoList extends React.Component {
 							{repos.map((repo, index) => (
 								<li
 									className="list-group-item list-group-item-action"
-									key={index}
+									key={repo.name}
 								>
 									<Link to={`/repo/${repo.name}`}>
 										<span>

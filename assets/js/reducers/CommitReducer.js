@@ -21,7 +21,10 @@ const commitReducer = (state = initialState, action) => {
         loading: action.payload.loading,
       };
     case types.CREATE_REPOSITORY_SUCCESS: {
-      return {...state, successMessage: action.payload.successMessage};
+			return {
+				...state,
+				successMessage: action.payload.successMessage,
+			};
     }
     case types.GET_REPOS_SUCCESS:
       return {
