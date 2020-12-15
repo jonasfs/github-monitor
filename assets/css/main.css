@@ -152,7 +152,13 @@ body {
   margin-top: 10px;
 }
 
-.sidebar-repos > .list > .paginator-wrapper > .counter {
+.sidebar-repos > .list > .paginator-wrapper > .counter,
+.commit-container > .commit-list > .card-footer > .paginator-wrapper > .counter {
+  text-align: right;
+  line-height: 40px;
+}
+
+.counter {
   text-align: right;
   line-height: 40px;
 }

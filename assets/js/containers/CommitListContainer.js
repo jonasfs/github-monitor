@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import * as commitAPI from '../api/CommitAPI';
 import CommitList from '../components/CommitList';
+import Paginator from '../components/Paginator';
 import { Link } from 'react-router-dom';
 
 
@@ -12,8 +13,19 @@ class CommitListContainer extends React.Component {
 		this.state = {
 			author:'',
 			repo:'',
+			limit: 10,
+			offset: 0,
 		}
 	}
+
+	getPage = newOffset => {
+		let {author, repo} = this.props.match.params;
+		let oldOffset = this.state.offset;
+		let {count} = this.props.data;
+		this.setState({offset: newOffset});
+		commitAPI.getCommits(author, repo, this.state.limit, newOffset, count);
+	}
+
   componentDidMount() {
 		let {author, repo} = this.props.match.params;
 		this.setState({author: author, repo: repo});
@@ -23,17 +35,20 @@ class CommitListContainer extends React.Component {
   componentDidUpdate() {
 		let {author, repo} = this.props.match.params;
 		if ((author !== this.state.author) || (repo !== this.state.repo) ) {
-			this.setState({author: author, repo: repo});
+			this.setState({author: author, repo: repo, offset: 0});
 			commitAPI.getCommits(author, repo);
 		}
 	}
 
   render() {
-    const {commits} = this.props;
-		let {author, repo} = this.props.match.params;
+		const { limit, offset } = this.state;
+		const { loading } = this.props;
+		const {count} = this.props.data;
+    const commits = this.props.data.results;
+		const {author, repo} = this.props.match.params;
 		const isHome = (!author && !repo);
     return (
-      <div>
+      <div className="commit-list-container">
 				<nav aria-label="breadcrumb" className="breadcrumb-nav">
 					<ol className="breadcrumb">
 						<li className={"breadcrumb-item"+ (isHome?" active":"")} aria-current="page">
@@ -58,18 +73,31 @@ class CommitListContainer extends React.Component {
 						) : ''}
 					</ol>
 				</nav>
-        <CommitList commits={commits} />
+				<CommitList
+					commits={commits}
+					paginator={
+						<Paginator
+							getPage={this.getPage}
+							offset={offset}
+							limit={limit}
+							count={count}
+							loading={loading}
+						/>
+					}
+				/>
       </div>
     );
   }
 }
 
 CommitListContainer.propTypes = {
-  commits: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: PropTypes.object.isRequired,
+  loading: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = store => ({
-  commits: store.commitState.commits,
+  data: store.commitState.data,
+  loading: store.commitState.loading,
 });
 
 export default connect(mapStateToProps)(CommitListContainer);

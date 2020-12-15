@@ -5,7 +5,7 @@ export const createRepositorySuccess = (response, successMessage) => ({
   payload: {response, successMessage},
 });
 
-export const getCommitsSuccess = commits => ({
+export const getCommitsSuccess = (data, loading) => ({
   type: types.GET_COMMITS_SUCCESS,
-  payload: commits,
+  payload: {data, loading},
 });
