@@ -96,11 +96,13 @@ class CommitTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(results), 0)
 
-        url = '{}?author=other_user&repository__name=other_repo'.format(self.url)
+        url = '{}?author=other_user&repository__name=other_repo'.format(
+            self.url)
         response = self.client.get(url, format='json')
         results = response.data['results']
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(results), 2)
+
 
 class RepositoryTests(APITestCase):
     def setUp(self):
@@ -145,6 +147,7 @@ class RepositoryTests(APITestCase):
                 'commit': {
                     'message': 'commit msg 1',
                     'author': {
+                        'email': 'fake_email@blah.com',
                         'date': timezone.now().isoformat(),
                     },
                 },
@@ -159,6 +162,7 @@ class RepositoryTests(APITestCase):
                 'commit': {
                     'message': 'commit msg 2',
                     'author': {
+                        'email': 'fake_email@blah.com',
                         'date': timezone.now().isoformat(),
                     },
                 },
@@ -227,3 +231,29 @@ class RepositoryTests(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
         results = response.data['results']
+
+    @patch('repositories.github_utils.repo_exists')
+    @patch('repositories.github_utils.fetch_commits')
+    def test_post_repository_that_has_null_author_commits(
+            self, mock_fetch_commits, mock_repo_exists):
+        mock_repo_exists.return_value = True
+        mock_fetch_commits.return_value = [{
+            'sha': 'abcdef',
+            'html_url': 'http://fakeurl.com',
+            'commit': {
+                'author': {
+                    'email': 'deleted_email@blah.com',
+                    'date': timezone.now().isoformat()
+                },
+                'message': 'blah msg',
+            },
+            'author': None,
+        }]
+        data = {
+            'name': 'test_repo'
+        }
+        response = self.client.post(self.url, data, format='json')
+        mock_repo_exists.assert_called()
+        self.assertEqual(response.status_code, 201)
+        commit_count = Commit.objects.all().count()
+        self.assertEqual(commit_count, 1)
