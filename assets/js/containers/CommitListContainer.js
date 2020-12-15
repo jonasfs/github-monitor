@@ -20,7 +20,6 @@ class CommitListContainer extends React.Component {
 
 	getPage = newOffset => {
 		let {author, repo} = this.props.match.params;
-		let oldOffset = this.state.offset;
 		let {count} = this.props;
 		this.setState({offset: newOffset});
 		commitAPI.getCommits(author, repo, this.state.limit, newOffset, count);
